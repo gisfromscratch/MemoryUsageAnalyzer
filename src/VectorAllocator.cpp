@@ -5,6 +5,7 @@ namespace edu {
 
 		VectorAllocator::VectorAllocator(std::size_t numberOfElements) : _numberOfElements(numberOfElements)
 		{
+			_stringCollection.reserve(0);
 		}
 
 		VectorAllocator::~VectorAllocator()
