@@ -13,7 +13,7 @@ using namespace std;
 void PrintMemoryInfo(DWORD processID)
 {
 	HANDLE hProcess;
-	PROCESS_MEMORY_COUNTERS pmc;
+	PROCESS_MEMORY_COUNTERS_EX pmc;
 
 	// Print the process identifier.
 
@@ -27,23 +27,25 @@ void PrintMemoryInfo(DWORD processID)
 	if (NULL == hProcess)
 		return;
 
-	if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
+	if (GetProcessMemoryInfo(hProcess, reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc), sizeof(pmc)))
 	{
-		printf("\tPageFaultCount: 0x%08X\n", pmc.PageFaultCount);
-		printf("\tPeakWorkingSetSize: 0x%08X\n",
+		printf("\tPageFaultCount: %u\n", pmc.PageFaultCount);
+		printf("\tPeakWorkingSetSize: %u\n",
 			pmc.PeakWorkingSetSize);
-		printf("\tWorkingSetSize: 0x%08X\n", pmc.WorkingSetSize);
-		printf("\tQuotaPeakPagedPoolUsage: 0x%08X\n",
+		printf("\tWorkingSetSize: %u\n", pmc.WorkingSetSize);
+		printf("\tQuotaPeakPagedPoolUsage: %u\n",
 			pmc.QuotaPeakPagedPoolUsage);
-		printf("\tQuotaPagedPoolUsage: 0x%08X\n",
+		printf("\tQuotaPagedPoolUsage: %u\n",
 			pmc.QuotaPagedPoolUsage);
-		printf("\tQuotaPeakNonPagedPoolUsage: 0x%08X\n",
+		printf("\tQuotaPeakNonPagedPoolUsage: %u\n",
 			pmc.QuotaPeakNonPagedPoolUsage);
-		printf("\tQuotaNonPagedPoolUsage: 0x%08X\n",
+		printf("\tQuotaNonPagedPoolUsage: %u\n",
 			pmc.QuotaNonPagedPoolUsage);
-		printf("\tPagefileUsage: 0x%08X\n", pmc.PagefileUsage);
-		printf("\tPeakPagefileUsage: 0x%08X\n",
+		printf("\tPagefileUsage: %u\n", pmc.PagefileUsage);
+		printf("\tPeakPagefileUsage: %u\n",
 			pmc.PeakPagefileUsage);
+
+		printf("\tPrivate Bytes: %u MB\n\n", pmc.PrivateUsage / 1024 / 1024);
 	}
 
 	CloseHandle(hProcess);
