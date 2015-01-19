@@ -5,6 +5,7 @@ namespace edu {
 
 		VectorAllocator::VectorAllocator(std::size_t numberOfElements) : _numberOfElements(numberOfElements)
 		{
+			// Do not allow default size reserving
 			_stringCollection.reserve(0);
 		}
 
