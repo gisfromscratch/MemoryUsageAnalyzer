@@ -139,7 +139,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		auto consoleOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 		CONSOLE_SCREEN_BUFFER_INFO originalColors;
 		GetConsoleScreenBufferInfo(consoleOutHandle, &originalColors);
-		//SetConsoleTextAttribute(consoleOutHandle, WHITE | BGBLACK);
 		wcout << L"Elapsed Time\tAvailable Physical\tAvailable Virtual\tAllocated Memory" << endl;
 
 		// Start time
