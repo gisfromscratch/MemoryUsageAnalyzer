@@ -3,3 +3,5 @@
 /Windows/Analyzer Console/*.sdf
 /Windows/Analyzer Console/Analyzer Console/Debug
 /Windows/Analyzer Console/*.suo
+/Windows/Analyzer Console/x64
+/Windows/Analyzer Console/Release
