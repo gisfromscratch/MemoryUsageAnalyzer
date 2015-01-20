@@ -79,13 +79,29 @@ static void PrintMemoryUsage()
 	}
 }
 
+static void PrintTableRow(time_point<system_clock> &startTime, int bytesToAllocate)
+{
+	const int conversionToBytes = 1024 * 1024;
+
+	// Query the memory state
+	MEMORYSTATUS memoryStatus;
+	GlobalMemoryStatus(&memoryStatus);
+
+	std::chrono::duration<double> elapsedSeconds = system_clock::now() - startTime;
+	GlobalMemoryStatus(&memoryStatus);
+	wcout << right << setw(6) << fixed << setprecision(2) << elapsedSeconds.count() << L" [sec]\t";
+	wcout << right << setw(13) << fixed << memoryStatus.dwAvailPhys / conversionToBytes << L" [MB]\t";
+	wcout << right << setw(12) << fixed << memoryStatus.dwAvailVirtual / conversionToBytes << L" [MB]\t";
+	wcout << right << setw(11) << fixed << bytesToAllocate / conversionToBytes << L" [MB]" << endl;
+}
+
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	// Command line parsing
 	auto duration = 3;
 	auto cycleCount = 8;
-	const int conversionToBytes = 1024 * 1024;
+	
 	switch (argc)
 	{
 		case 2:
@@ -147,18 +163,14 @@ int _tmain(int argc, _TCHAR* argv[])
 				if (0 == memoryHandle)
 				{
 					SetConsoleTextAttribute(consoleOutHandle, RED | BGBLACK);
+					PrintTableRow(startTime, bytesToAllocate);
 					wcerr << L"Allocation failed. Trying again" << endl;
 					SetConsoleTextAttribute(consoleOutHandle, originalColors.wAttributes);
 					continue;
 				}
 
 				// Print the memory infos
-				std::chrono::duration<double> elapsedSeconds = system_clock::now() - startTime;
-				GlobalMemoryStatus(&memoryStatus);
-				wcout << elapsedSeconds.count() << L" [sec]\t";
-				wcout << memoryStatus.dwAvailPhys / conversionToBytes << L" [MB]\t";
-				wcout << memoryStatus.dwAvailVirtual / conversionToBytes << L" [MB]\t";
-				wcout << bytesToAllocate / conversionToBytes << L" [MB]" << endl;
+				PrintTableRow(startTime, bytesToAllocate);
 
 				// Free the allocated memory
 				GlobalFree(memoryHandle);
