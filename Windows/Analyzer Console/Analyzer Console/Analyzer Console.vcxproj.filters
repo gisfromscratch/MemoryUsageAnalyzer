@@ -24,10 +24,10 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Header\IAllocationScenario.h">
+    <ClInclude Include="..\..\..\header\VectorAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\VectorAllocator.h">
+    <ClInclude Include="..\..\..\header\IAllocationScenario.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
