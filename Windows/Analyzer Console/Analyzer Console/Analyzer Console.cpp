@@ -4,12 +4,14 @@
 #include "stdafx.h"
 
 #include <chrono>
+#include <cmath>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <memory>
 #include <Psapi.h>
 
+#include "GrowingGlobalAllocator.h"
 #include "RandomGlobalAllocator.h"
 #include "VectorAllocator.h"
 
@@ -140,8 +142,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		time_point<system_clock> startTime = system_clock::now();
 		time_point<system_clock> endTime = startTime + minutes(duration);
 		DWORD BreakDuration = 3000;
-		RandomGlobalAllocator allocator;
-		while (system_clock::now() < endTime)
+		GrowingGlobalAllocator allocator(100 * pow(1024, 2), 10 * pow(1024, 2));
+		auto allocatorFailed = false;
+		while (system_clock::now() < endTime && !allocatorFailed)
 		{
 			for (auto cycle = 0; cycle < cycleCount; cycle++)
 			{
@@ -150,9 +153,10 @@ int _tmain(int argc, _TCHAR* argv[])
 				{
 					SetConsoleTextAttribute(consoleOutHandle, RED | BGBLACK);
 					PrintTableRow(startTime, allocationResult.bytes());
-					wcerr << L"Allocation failed. Trying again" << endl;
+					wcerr << L"Allocation failed." << endl;
 					SetConsoleTextAttribute(consoleOutHandle, originalColors.wAttributes);
-					continue;
+					allocatorFailed = true;
+					break;
 				}
 				
 				// Release memory
