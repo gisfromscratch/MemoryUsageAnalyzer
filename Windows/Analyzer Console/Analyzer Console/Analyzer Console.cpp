@@ -9,8 +9,9 @@
 #include <iostream>
 #include <memory>
 #include <Psapi.h>
-#include <random>
-#include <VectorAllocator.h>
+
+#include "RandomGlobalAllocator.h"
+#include "VectorAllocator.h"
 
 using namespace edu::memory;
 using namespace std::chrono;
@@ -61,7 +62,6 @@ static void PrintMemoryUsage()
 {
 	// Get the list of process identifiers.
 	DWORD processes[1024], processIdentifierCount, numberOfProcesses;
-	unsigned int i;
 
 	if (!EnumProcesses(processes, sizeof(processes), &processIdentifierCount))
 	{
@@ -73,7 +73,7 @@ static void PrintMemoryUsage()
 	numberOfProcesses = processIdentifierCount / sizeof(DWORD);
 
 	// Print the memory usage for each process
-	for (auto index = 0; index < processIdentifierCount; index++)
+	for (unsigned int index = 0; index < processIdentifierCount; index++)
 	{
 		PrintMemoryInfo(processes[index]);
 	}
@@ -128,12 +128,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	try
 	{
-		// Random percent
-		const double LowerDistributionBound = 0.3;
-		const double UpperDistributionBound = 0.7;
-		uniform_real_distribution<double> distribution(LowerDistributionBound, UpperDistributionBound);
-		random_device randomDevice;
-		std::mt19937 randomEngine(randomDevice());
+		
 
 		// Print header
 		auto consoleOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -145,34 +140,26 @@ int _tmain(int argc, _TCHAR* argv[])
 		time_point<system_clock> startTime = system_clock::now();
 		time_point<system_clock> endTime = startTime + minutes(duration);
 		DWORD BreakDuration = 3000;
+		RandomGlobalAllocator allocator;
 		while (system_clock::now() < endTime)
 		{
 			for (auto cycle = 0; cycle < cycleCount; cycle++)
 			{
-				// Random percent calculating
-				double memoryPercent = distribution(randomEngine);
-
-				// Query the memory state
-				MEMORYSTATUS memoryStatus;
-				GlobalMemoryStatus(&memoryStatus);
-
-				// Allocate memory
-				auto bytesToAllocate = memoryPercent * memoryStatus.dwAvailVirtual;
-				auto memoryHandle = GlobalAlloc(GMEM_FIXED | GMEM_ZEROINIT, bytesToAllocate);
-				if (0 == memoryHandle)
+				auto allocationResult = allocator.allocate();
+				if (!allocationResult.succeeded())
 				{
 					SetConsoleTextAttribute(consoleOutHandle, RED | BGBLACK);
-					PrintTableRow(startTime, bytesToAllocate);
+					PrintTableRow(startTime, allocationResult.bytes());
 					wcerr << L"Allocation failed. Trying again" << endl;
 					SetConsoleTextAttribute(consoleOutHandle, originalColors.wAttributes);
 					continue;
 				}
+				
+				// Release memory
+				allocator.deallocate();
 
 				// Print the memory infos
-				PrintTableRow(startTime, bytesToAllocate);
-
-				// Free the allocated memory
-				GlobalFree(memoryHandle);
+				PrintTableRow(startTime, allocationResult.bytes());
 			}
 			Sleep(BreakDuration);
 		}

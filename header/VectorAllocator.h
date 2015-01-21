@@ -1,6 +1,10 @@
 #include "IAllocationScenario.h"
+#include "AllocationResult.h"
 
 #include <vector>
+
+#ifndef _VECTOR_ALLOCATOR_
+#define _VECTOR_ALLOCATOR_
 
 namespace edu {
 	namespace memory {
@@ -16,7 +20,9 @@ namespace edu {
 
 			virtual std::wstring scenarioName() override;
 
-			virtual void allocate() override;
+			virtual AllocationResult allocate() override;
+
+			virtual void deallocate() override;
 
 		private:
 			std::size_t _numberOfElements;
@@ -24,3 +30,5 @@ namespace edu {
 		};
 	}
 }
+
+#endif

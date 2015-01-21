@@ -146,12 +146,15 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\header\AllocationResult.h" />
+    <ClInclude Include="..\..\..\header\RandomGlobalAllocator.h" />
     <ClInclude Include="..\..\..\header\VectorAllocator.h" />
     <ClInclude Include="..\..\..\header\IAllocationScenario.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\RandomGlobalAllocator.cpp" />
     <ClCompile Include="..\..\..\src\VectorAllocator.cpp" />
     <ClCompile Include="Analyzer Console.cpp" />
     <ClCompile Include="stdafx.cpp">
